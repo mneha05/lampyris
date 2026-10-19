@@ -1,5 +1,7 @@
 # lampyris
 
+[![ci](https://github.com/mneha05/lampyris/actions/workflows/ci.yml/badge.svg)](https://github.com/mneha05/lampyris/actions/workflows/ci.yml)
+
 **A swarm of tiny microcontrollers that learn to blink in unison the way fireflies do, with no radio, no shared clock and no leader.**
 
 Each node has exactly one LED. It uses that LED to **flash** and also to **see**: between flashes the LED is reverse-biased and works as a photodiode. Scatter a handful of nodes around a dark room, switch them on at random times, and within a few cycles they are blinking as one.
@@ -16,7 +18,7 @@ Each node has exactly one LED. It uses that LED to **flash** and also to **see**
 - **The physics is real.** Nodes are pulse-coupled oscillators (Mirollo & Strogatz, 1990). Nodes only influence each other through light, and the simulator models nothing else. A blindfolded swarm never syncs, and a test proves it.
 - **It survives the real world.** An onset detector catches a new flash even while other neighbours are still glowing, tracks dusk falling from daylight to dark, and recovers when someone switches on a porch light.
 - **It's honest about clocks.** Every node runs on its own crystal or RC oscillator, and the simulator gives each one a different natural period. Optional **frequency adaptation**, modelled on Southeast Asian *Pteroptyx* fireflies, lets nodes adjust their tempo as well as their phase.
-- **Tiny and integer-only.** The core uses no floats, no `malloc` and no RTOS. A whole firefly is 82 bytes of RAM on AVR, so it fits an ATtiny85.
+- **Tiny and integer-only.** The core uses no floats, no `malloc` and no RTOS. A whole firefly is 82 bytes of RAM; the complete Uno firmware is 4.4 KB of flash and 115 bytes of RAM.
 - **Tested like software.** 395 checks run with gcc and clang under ASan/UBSan, plus swarm-level tests that run hundreds of simulated fireflies across many seeds. CI also compiles the firmware for Uno, Nano, Leonardo and Raspberry Pi Pico.
 
 ## Quick start (no hardware needed)
