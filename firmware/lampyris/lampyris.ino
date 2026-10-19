@@ -35,6 +35,11 @@
 #define PIN_CATHODE      1
 #define PIN_SENSE        A1
 #define PIN_SEED         A3
+#elif defined(ARDUINO_ARCH_RP2040)
+#define PIN_ANODE        2
+#define PIN_CATHODE      3
+#define PIN_SENSE        A0
+#define PIN_SEED         A2                /* leave GP28 unconnected        */
 #else
 #define PIN_ANODE        2
 #define PIN_CATHODE      3

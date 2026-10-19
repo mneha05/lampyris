@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: build and test
-        run: make test CC=${{ matrix.cc }}
+        run: make all test CC=${{ matrix.cc }}
       - name: run the swarm
         run: ./build/swarm
       - name: sanitizers
