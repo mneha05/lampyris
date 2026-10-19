@@ -1,0 +1,56 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  host:
+    name: tests + simulator (${{ matrix.cc }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        cc: [gcc, clang]
+    steps:
+      - uses: actions/checkout@v4
+      - name: build and test
+        run: make test CC=${{ matrix.cc }}
+      - name: run the swarm
+        run: ./build/swarm
+      - name: sanitizers
+        run: |
+          make clean
+          make test CC=${{ matrix.cc }} CFLAGS="-std=c99 -O1 -g -Wall -Wextra -Werror -fsanitize=address,undefined -fno-omit-frame-pointer"
+
+  firmware:
+    name: firmware (${{ matrix.fqbn }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - fqbn: arduino:avr:uno
+            core: arduino:avr
+          - fqbn: arduino:avr:nano
+            core: arduino:avr
+          - fqbn: arduino:avr:leonardo
+            core: arduino:avr
+          - fqbn: rp2040:rp2040:rpipico
+            core: rp2040:rp2040
+            url: https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json
+    steps:
+      - uses: actions/checkout@v4
+      - uses: arduino/setup-arduino-cli@v2
+      - name: install core
+        run: |
+          arduino-cli core update-index ${{ matrix.url && format('--additional-urls {0}', matrix.url) || '' }}
+          arduino-cli core install ${{ matrix.core }} ${{ matrix.url && format('--additional-urls {0}', matrix.url) || '' }}
+      - name: compile
+        run: |
+          arduino-cli compile --fqbn ${{ matrix.fqbn }} --warnings all \
+            ${{ matrix.url && format('--additional-urls {0}', matrix.url) || '' }} firmware/lampyris
+      - name: compile (debug + analog sensor)
+        run: |
+          arduino-cli compile --fqbn ${{ matrix.fqbn }} --warnings all \
+            --build-property "compiler.cpp.extra_flags=-DLAMPYRIS_DEBUG -DLAMPYRIS_SENSE_ANALOG" \
+            ${{ matrix.url && format('--additional-urls {0}', matrix.url) || '' }} firmware/lampyris
